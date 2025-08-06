@@ -1,23 +1,43 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { generate } from 'random-words';
 
-// Data and utils are now self-contained in this file
-const words = [
-  'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'i',
-  'it', 'for', 'not', 'on', 'with', 'he', 'as', 'you', 'do', 'at',
-  'this', 'but', 'his', 'by', 'from', 'they', 'we', 'say', 'her', 'she',
-  'or', 'an', 'will', 'my', 'one', 'all', 'would', 'there', 'their', 'what',
-  'so', 'up', 'out', 'if', 'about', 'who', 'get', 'which', 'go', 'me',
-  'when', 'make', 'can', 'like', 'time', 'no', 'just', 'him', 'know', 'take',
-  'people', 'into', 'year', 'your', 'good', 'some', 'could', 'them', 'see', 'other',
-  'than', 'then', 'now', 'look', 'only', 'come', 'its', 'over', 'think', 'also',
-  'back', 'after', 'use', 'two', 'how', 'our', 'work', 'first', 'well', 'way',
-  'even', 'new', 'want', 'because', 'any', 'these', 'give', 'day', 'most', 'us'
-];
 
-const getRandomWords = (count) => {
-  const shuffled = [...words].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, count);
-};
+
+// const getRandomWords = (count) => {
+//   const commonWords = [
+//     'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'i',
+//     'it', 'for', 'not', 'on', 'with', 'he', 'as', 'you', 'do', 'at',
+//     'this', 'but', 'his', 'by', 'from', 'they', 'we', 'say', 'her', 'she',
+//     'or', 'an', 'will', 'my', 'one', 'all', 'would', 'there', 'their',
+//     'what', 'so', 'up', 'out', 'if', 'about', 'who', 'get', 'which', 'go',
+//     'me', 'when', 'make', 'can', 'like', 'time', 'no', 'just', 'him', 'know',
+//     'take', 'people', 'into', 'year', 'your', 'good', 'some', 'could', 'them',
+//     'see', 'other', 'than', 'then', 'now', 'look', 'only', 'come', 'its', 'over',
+//     'think', 'also', 'back', 'after', 'use', 'two', 'how', 'our', 'work', 'first',
+//     'well', 'way', 'even', 'new', 'want', 'because', 'any', 'these', 'give', 'day',
+//     'most', 'us', 'is', 'water', 'long', 'find', 'here', 'thing', 'great', 'man',
+//     'world', 'life', 'still', 'hand', 'high', 'right', 'move', 'too', 'old', 'same',
+//     'tell', 'boy', 'follow', 'came', 'want', 'show', 'also', 'around', 'farm', 'three',
+//     'small', 'set', 'put', 'end', 'why', 'again', 'turn', 'every', 'should', 'another',
+//     'think', 'where', 'help', 'through', 'much', 'before', 'line', 'right', 'too', 'means',
+//     'old', 'any', 'same', 'tell', 'boy', 'follow', 'came', 'want', 'show', 'also',
+//     'around', 'farm', 'three', 'small', 'set', 'put', 'end', 'why', 'again', 'turn',
+//     'every', 'should', 'another', 'think', 'where', 'help', 'through', 'much', 'before'
+//   ];
+//   const words = [];
+//   for (let i = 0; i < count; i++) {
+//     words.push(commonWords[Math.floor(Math.random() * commonWords.length)]);
+//   }
+//   return words;
+// };
+
+
+
+
+
+ // Generate an array of random words
+const getRandomWords = (count) => generate({ exactly: count });
+  
 
 const calculateWPM = (correctChars, timeElapsed) => {
   if (timeElapsed === 0) return 0;
@@ -38,8 +58,6 @@ const calculateRawWPM = (totalChars, timeElapsed) => {
   return Math.round(wordsTyped / minutes);
 };
 
-
-// The main hook
 export const useTypingTest = (duration = 60) => {
   const [words, setWords] = useState([]);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
@@ -56,12 +74,12 @@ export const useTypingTest = (duration = 60) => {
   const [incorrectWords, setIncorrectWords] = useState(0);
   const [wordStates, setWordStates] = useState([]);
   const [charStates, setCharStates] = useState([]);
-  
+
   const timerRef = useRef(null);
   const testDuration = useRef(duration);
 
   const initializeTest = useCallback(() => {
-    const newWords = getRandomWords(200);
+    const newWords = getRandomWords(200); // Generate 200 words initially
     setWords(newWords);
     setCurrentWordIndex(0);
     setCurrentCharIndex(0);
@@ -75,12 +93,12 @@ export const useTypingTest = (duration = 60) => {
     setIncorrectChars(0);
     setCorrectWords(0);
     setIncorrectWords(0);
-    
+
     const newWordStates = newWords.map(() => 'pending');
     const newCharStates = newWords.map(word => Array(word.length).fill('pending'));
     setWordStates(newWordStates);
     setCharStates(newCharStates);
-    
+
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
@@ -91,7 +109,7 @@ export const useTypingTest = (duration = 60) => {
       const now = Date.now();
       setStartTime(now);
       setIsActive(true);
-      
+
       timerRef.current = setInterval(() => {
         setTimeLeft((prevTime) => {
           if (prevTime <= 1) {
@@ -119,13 +137,10 @@ export const useTypingTest = (duration = 60) => {
 
     if (char === ' ') {
       const isWordCorrect = input === currentWord;
-      
+
       setWordStates(prev => {
         const newStates = [...prev];
         newStates[currentWordIndex] = isWordCorrect ? 'correct' : 'incorrect';
-        if (currentWordIndex + 1 < words.length) {
-          newStates[currentWordIndex + 1] = 'current';
-        }
         return newStates;
       });
 
@@ -137,15 +152,24 @@ export const useTypingTest = (duration = 60) => {
         setIncorrectChars(prev => prev + Math.max(input.length, currentWord.length) + 1);
       }
 
+      // Add more words when getting close to the end
+      if (currentWordIndex > words.length - 50) {
+        const newWords = getRandomWords(200);
+        setWords(prev => [...prev, ...newWords]);
+        setWordStates(prev => [...prev, ...newWords.map(() => 'pending')]);
+        setCharStates(prev => [...prev, ...newWords.map(word => Array(word.length).fill('pending'))]);
+      }
+
       setCurrentWordIndex(prev => prev + 1);
       setCurrentCharIndex(0);
       setInput('');
+
     } else if (char === 'Backspace') {
       if (input.length > 0) {
         const newInput = input.slice(0, -1);
         setInput(newInput);
         setCurrentCharIndex(newInput.length);
-        
+
         setCharStates(prev => {
           const newStates = [...prev];
           if (newStates[currentWordIndex]) {
@@ -157,9 +181,9 @@ export const useTypingTest = (duration = 60) => {
     } else {
       const newInput = input + char;
       setInput(newInput);
-      
+
       const isCorrect = char === currentWord[currentCharIndex];
-      
+
       setCharStates(prev => {
         const newStates = [...prev];
         if (newStates[currentWordIndex]) {
@@ -167,7 +191,7 @@ export const useTypingTest = (duration = 60) => {
         }
         return newStates;
       });
-      
+
       setCurrentCharIndex(prev => prev + 1);
     }
   }, [words, currentWordIndex, currentCharIndex, input, isActive, isFinished, startTest]);
@@ -175,7 +199,7 @@ export const useTypingTest = (duration = 60) => {
   const getStats = useCallback(() => {
     const timeElapsed = startTime ? Math.max(1, testDuration.current - timeLeft) : 0;
     const totalChars = correctChars + incorrectChars;
-    
+
     return {
       wpm: calculateWPM(correctChars, timeElapsed),
       rawWpm: calculateRawWPM(totalChars, timeElapsed),

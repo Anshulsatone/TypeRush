@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Keyboard, Clock, Target, CheckCircle, XCircle, Zap } from 'lucide-react';
 
-// Stats component is now defined locally
+// Stats component
 const Stats = ({ stats, timeLeft, testDuration, isActive }) => {
   const progress = ((testDuration - timeLeft) / testDuration) * 100;
 
@@ -20,23 +20,38 @@ const Stats = ({ stats, timeLeft, testDuration, isActive }) => {
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-center mb-2"><Zap className="w-5 h-5 text-yellow-500 mr-2" /><span className="text-sm font-medium text-gray-600 dark:text-gray-400">WPM</span></div>
+          <div className="flex items-center justify-center mb-2">
+            <Zap className="w-5 h-5 text-yellow-500 mr-2" />
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">WPM</span>
+          </div>
           <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.wpm}</div>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-center mb-2"><Target className="w-5 h-5 text-blue-500 mr-2" /><span className="text-sm font-medium text-gray-600 dark:text-gray-400">Accuracy</span></div>
+          <div className="flex items-center justify-center mb-2">
+            <Target className="w-5 h-5 text-blue-500 mr-2" />
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Accuracy</span>
+          </div>
           <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.accuracy}%</div>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-center mb-2"><CheckCircle className="w-5 h-5 text-green-500 mr-2" /><span className="text-sm font-medium text-gray-600 dark:text-gray-400">Correct</span></div>
+          <div className="flex items-center justify-center mb-2">
+            <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Correct</span>
+          </div>
           <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.correctWords}</div>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-center mb-2"><XCircle className="w-5 h-5 text-red-500 mr-2" /><span className="text-sm font-medium text-gray-600 dark:text-gray-400">Wrong</span></div>
+          <div className="flex items-center justify-center mb-2">
+            <XCircle className="w-5 h-5 text-red-500 mr-2" />
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Wrong</span>
+          </div>
           <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.incorrectWords}</div>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-center mb-2"><Clock className="w-5 h-5 text-purple-500 mr-2" /><span className="text-sm font-medium text-gray-600 dark:text-gray-400">Time</span></div>
+          <div className="flex items-center justify-center mb-2">
+            <Clock className="w-5 h-5 text-purple-500 mr-2" />
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Time</span>
+          </div>
           <div className="text-2xl font-bold text-gray-900 dark:text-white">{timeLeft}s</div>
         </div>
       </div>
@@ -44,47 +59,87 @@ const Stats = ({ stats, timeLeft, testDuration, isActive }) => {
   );
 };
 
-// WordDisplay component is now defined locally
+// Fixed WordDisplay component - MonkeyType style
 const WordDisplay = ({ words, currentWordIndex, currentCharIndex, charStates, input }) => {
+  const wordsRef = useRef(null);
+  const currentWordRef = useRef(null);
+
+  // Auto-scroll to keep current word in view
+  useEffect(() => {
+    if (currentWordRef.current && wordsRef.current) {
+      const container = wordsRef.current;
+      const currentWord = currentWordRef.current;
+      const containerRect = container.getBoundingClientRect();
+      const wordRect = currentWord.getBoundingClientRect();
+      
+      // If current word is getting close to bottom, scroll up
+      if (wordRect.top > containerRect.top + containerRect.height * 0.6) {
+        container.scrollTop += wordRect.top - containerRect.top - containerRect.height * 0.3;
+      }
+    }
+  }, [currentWordIndex]);
+
   const getCharClassName = (wordIndex, charIndex) => {
     const baseClass = "transition-all duration-150";
 
     if (wordIndex === currentWordIndex) {
       if (charIndex === currentCharIndex) {
-        return `${baseClass} bg-yellow-400 dark:bg-yellow-500 text-black`;
+        return `${baseClass} bg-yellow-400 dark:bg-yellow-500 text-black animate-pulse`;
       }
       if (charIndex < input.length) {
         const isCorrect = charStates[wordIndex]?.[charIndex] === 'correct';
-        return `${baseClass} ${isCorrect ? 'text-green-400 dark:text-green-400' : 'text-red-400 dark:text-red-400 bg-red-900/30'}`;
+        return `${baseClass} ${isCorrect ? 'text-green-400' : 'text-red-400 bg-red-900/30'}`;
       }
     } else if (wordIndex < currentWordIndex) {
+      // Completed words are dimmed but still visible
       const isCorrect = charStates[wordIndex]?.[charIndex] === 'correct';
-      return `${baseClass} ${isCorrect ? 'text-green-400 dark:text-green-400' : 'text-red-400 dark:text-red-400'}`;
+      return `${baseClass} ${isCorrect ? 'text-green-400/70' : 'text-red-400/70'} opacity-70`;
     }
+    
+    // Future words
     return `${baseClass} text-gray-500 dark:text-gray-400`;
   };
 
   const getWordClassName = (wordIndex) => {
-    const baseClass = "mr-3 mb-2 inline-block transition-all duration-300";
+    const baseClass = "mr-3 mb-2 inline-block transition-all duration-300 relative";
+    
     if (wordIndex === currentWordIndex) {
       return `${baseClass} transform scale-105`;
+    } else if (wordIndex < currentWordIndex) {
+      // Completed words
+      return `${baseClass} opacity-70`;
     }
+    
     return baseClass;
   };
 
   return (
-    <div className="text-center px-4">
+    <div 
+      ref={wordsRef}
+      className="text-center px-4 max-h-40 overflow-hidden relative"
+    >
       <div className="text-2xl md:text-3xl leading-relaxed max-w-4xl mx-auto">
-        {words.slice(0, 50).map((word, wordIndex) => (
-          <span key={wordIndex} className={getWordClassName(wordIndex)}>
+        {words.map((word, wordIndex) => (
+          <span 
+            key={wordIndex} 
+            ref={wordIndex === currentWordIndex ? currentWordRef : null}
+            className={getWordClassName(wordIndex)}
+          >
             {word.split('').map((char, charIndex) => (
-              <span key={charIndex} className={getCharClassName(wordIndex, charIndex)}>
+              <span 
+                key={charIndex} 
+                className={getCharClassName(wordIndex, charIndex)}
+              >
                 {char}
               </span>
             ))}
+            {/* Show extra characters typed for current word */}
             {wordIndex === currentWordIndex && input.length > word.length && (
               input.slice(word.length).split('').map((char, extraIndex) => (
-                <span key={`extra-${extraIndex}`} className="bg-red-900/50 text-red-400 transition-all duration-150">
+                <span 
+                  key={`extra-${extraIndex}`} 
+                  className="bg-red-900/50 text-red-400 transition-all duration-150"
+                >
                   {char}
                 </span>
               ))
@@ -92,12 +147,14 @@ const WordDisplay = ({ words, currentWordIndex, currentCharIndex, charStates, in
           </span>
         ))}
       </div>
+      
+      {/* Fade effect at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-gray-50 dark:from-gray-900 to-transparent pointer-events-none" />
     </div>
   );
 };
 
-
-// The main component for this file
+// Main TypingArea component
 const TypingArea = ({ words, currentWordIndex, currentCharIndex, input, charStates, timeLeft, isActive, isFinished, stats, testDuration, onInput, onDurationChange }) => {
   const containerRef = useRef(null);
 
