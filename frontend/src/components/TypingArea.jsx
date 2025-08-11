@@ -6,6 +6,7 @@ const Stats = ({ stats, timeLeft, testDuration, isActive }) => {
   const progress = ((testDuration - timeLeft) / testDuration) * 100;
 
   return (
+    //progress bar and stats display
     <div className="w-full max-w-4xl mx-auto px-4">
       {isActive && (
         <div className="mb-6">
@@ -59,7 +60,7 @@ const Stats = ({ stats, timeLeft, testDuration, isActive }) => {
   );
 };
 
-// Fixed WordDisplay component - MonkeyType style
+// Fixed WordDisplay component - style
 const WordDisplay = ({ words, currentWordIndex, currentCharIndex, charStates, input }) => {
   const wordsRef = useRef(null);
   const currentWordRef = useRef(null);
@@ -189,7 +190,7 @@ const TypingArea = ({ words, currentWordIndex, currentCharIndex, input, charStat
       <div className="text-center mb-8">
         <div className="flex items-center justify-center mb-6">
           <Keyboard className="w-8 h-8 text-yellow-500 mr-3" />
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white">TypeSpeed</h1>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white">TypeRush</h1>
         </div>
 
         {!isActive && !isFinished && (
