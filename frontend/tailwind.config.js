@@ -1,18 +1,10 @@
-/** @type {import('tailwindcss').Config} */
 module.exports = {
-  // This line enables class-based dark mode
-  darkMode: 'class',
-
-  // This tells Tailwind where to find your class names
+  darkMode: 'class', // not 'media'
   content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
+    "./src/**/*.{js,jsx,ts,tsx}", // adjust if needed
   ],
-
-  // This is where you can customize Tailwind's default design system
   theme: {
     extend: {},
   },
-
-  // This is where you can add official Tailwind plugins
   plugins: [],
 }
